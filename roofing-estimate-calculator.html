@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roof Replacement Estimate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal:#262521;
+    --paper:#ECE6D8;
+    --paper-dim:#E1DACB;
+    --copper:#B5651D;
+    --copper-dark:#8F4E16;
+    --slate:#55707C;
+    --moss:#6E7F58;
+    --line: rgba(38,37,33,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--charcoal);
+    font-family:'Inter', system-ui, sans-serif;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:1000px;
+    margin:0 auto;
+    padding:48px 24px 80px;
+  }
+  header{
+    border-bottom:1px solid var(--line);
+    padding-bottom:28px;
+    margin-bottom:36px;
+  }
+  h1{
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    font-size:clamp(28px, 4vw, 40px);
+    letter-spacing:0.2px;
+    margin:0 0 10px;
+    color:var(--charcoal);
+  }
+  .sub{
+    color:#54524A;
+    font-size:15.5px;
+    max-width:520px;
+  }
+  .ticks{
+    display:flex;
+    gap:4px;
+    margin-top:18px;
+  }
+  .ticks span{
+    height:8px;
+    width:1px;
+    background:var(--line);
+  }
+  .ticks span:nth-child(5n+1){ height:14px; background:var(--charcoal); opacity:0.5;}
+
+  .grid{
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:0;
+    border:1px solid var(--line);
+  }
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    padding:32px;
+  }
+  .panel.inputs{
+    border-right:1px solid var(--line);
+  }
+  @media (max-width:760px){
+    .panel.inputs{border-right:none; border-bottom:1px solid var(--line);}
+  }
+
+  .field{
+    margin-bottom:26px;
+  }
+  .field label{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:13.5px;
+    font-weight:600;
+    margin-bottom:10px;
+    color:var(--charcoal);
+  }
+  .field label .val{
+    font-family:'Oswald', sans-serif;
+    color:var(--copper);
+    font-size:15px;
+  }
+
+  input[type="range"]{
+    -webkit-appearance:none;
+    width:100%;
+    height:2px;
+    background:var(--line);
+    outline:none;
+    margin:8px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;
+    height:16px;
+    background:var(--copper);
+    border:2px solid var(--paper);
+    box-shadow:0 0 0 1px var(--copper);
+    border-radius:50%;
+    cursor:pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:16px;
+    height:16px;
+    background:var(--copper);
+    border:2px solid var(--paper);
+    box-shadow:0 0 0 1px var(--copper);
+    border-radius:50%;
+    cursor:pointer;
+    border:none;
+  }
+
+  .options{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:8px;
+  }
+  .options.wide{ grid-template-columns:repeat(3, 1fr); }
+  .opt{
+    border:1px solid var(--line);
+    padding:10px 12px;
+    font-size:13.5px;
+    cursor:pointer;
+    background:transparent;
+    color:var(--charcoal);
+    text-align:left;
+    font-family:'Inter', sans-serif;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  .opt:hover{ border-color:var(--slate); }
+  .opt.active{
+    border-color:var(--copper);
+    background:rgba(181,101,29,0.08);
+    color:var(--copper-dark);
+    font-weight:600;
+  }
+  .opt small{
+    display:block;
+    font-weight:400;
+    color:#6B695F;
+    margin-top:2px;
+    font-size:12px;
+  }
+  .opt.active small{ color:var(--copper-dark); opacity:0.75; }
+
+  .panel.result{
+    background:var(--charcoal);
+    color:var(--paper);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .estimate-label{
+    font-size:12.5px;
+    color:#B9B5A8;
+    margin-bottom:6px;
+  }
+  .estimate{
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    font-size:clamp(30px, 4vw, 40px);
+    color:var(--paper);
+    letter-spacing:0.3px;
+    line-height:1.1;
+    border-bottom:1px dashed rgba(236,230,216,0.3);
+    padding-bottom:20px;
+    margin-bottom:20px;
+  }
+  .estimate .sep{
+    color:#8A8779;
+    font-weight:400;
+    font-size:0.6em;
+    padding:0 6px;
+  }
+  .breakdown{
+    font-size:13px;
+    color:#C7C3B5;
+  }
+  .breakdown div{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border-bottom:1px solid rgba(236,230,216,0.1);
+  }
+  .breakdown div span:last-child{
+    color:var(--paper);
+    font-family:'Oswald', sans-serif;
+    font-weight:500;
+  }
+
+  .cta-block{
+    margin-top:28px;
+  }
+  .note{
+    font-size:12px;
+    color:#918D7E;
+    margin-bottom:16px;
+  }
+  button.primary{
+    width:100%;
+    padding:14px 16px;
+    background:var(--copper);
+    color:var(--paper);
+    border:none;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    transition:background 0.15s;
+  }
+  button.primary:hover{ background:var(--copper-dark); }
+
+  .lead-form{
+    display:none;
+    flex-direction:column;
+    gap:10px;
+  }
+  .lead-form.active{ display:flex; }
+  .lead-form input{
+    padding:11px 12px;
+    background:transparent;
+    border:1px solid rgba(236,230,216,0.35);
+    color:var(--paper);
+    font-family:'Inter', sans-serif;
+    font-size:13.5px;
+  }
+  .lead-form input::placeholder{ color:#918D7E; }
+  .lead-form input:focus{ outline:none; border-color:var(--copper); }
+
+  .confirm{
+    display:none;
+    text-align:left;
+  }
+  .confirm.active{ display:block; }
+  .confirm .check{
+    color:var(--moss);
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    margin-bottom:6px;
+  }
+  .confirm p{
+    color:#C7C3B5;
+    font-size:13px;
+    margin:0;
+  }
+
+  footer{
+    margin-top:20px;
+    font-size:12px;
+    color:#8C8A80;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Roof replacement estimate</h1>
+    <p class="sub">Answer a few questions about the job. The range updates as you go — a real quote still needs a site visit, but this gives you a starting point.</p>
+    <div class="ticks" id="ticks"></div>
+  </header>
+
+  <div class="grid">
+    <div class="panel inputs">
+
+      <div class="field">
+        <label>Roof size <span class="val" id="sqftVal">2,000 sq ft</span></label>
+        <input type="range" id="sqft" min="800" max="6000" step="50" value="2000">
+      </div>
+
+      <div class="field">
+        <label>Material</label>
+        <div class="options" id="materialOpts">
+          <button class="opt active" data-key="asphalt" data-low="4.5" data-high="7">Asphalt shingle<small>$4.50–7/sq ft</small></button>
+          <button class="opt" data-key="metal" data-low="8" data-high="14">Standing seam metal<small>$8–14/sq ft</small></button>
+          <button class="opt" data-key="tile" data-low="10" data-high="18">Clay / concrete tile<small>$10–18/sq ft</small></button>
+          <button class="opt" data-key="slate" data-low="15" data-high="25">Natural slate<small>$15–25/sq ft</small></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Roof pitch / complexity</label>
+        <div class="options wide" id="pitchOpts">
+          <button class="opt active" data-key="simple" data-mult="1.0">Low pitch<small>Simple layout</small></button>
+          <button class="opt" data-key="moderate" data-mult="1.15">Moderate<small>Some valleys</small></button>
+          <button class="opt" data-key="steep" data-mult="1.35">Steep<small>Multiple angles</small></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Stories</label>
+        <div class="options wide" id="storyOpts">
+          <button class="opt active" data-key="1" data-mult="1.0">1 story</button>
+          <button class="opt" data-key="2" data-mult="1.1">2 stories</button>
+          <button class="opt" data-key="3" data-mult="1.25">3+ stories</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:0;">
+        <label>Existing roof</label>
+        <div class="options" id="tearoffOpts">
+          <button class="opt active" data-key="0">New construction<small>No tear-off needed</small></button>
+          <button class="opt" data-key="1.5">Tear-off required<small>+$1.50/sq ft</small></button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel result">
+      <div>
+        <div class="estimate-label">Estimated project cost</div>
+        <div class="estimate"><span id="lowEst">$9,000</span><span class="sep">/</span><span id="highEst">$14,000</span></div>
+        <div class="breakdown" id="breakdown"></div>
+      </div>
+
+      <div class="cta-block">
+        <div class="note">Want the real number? Get a fixed quote from a measured site visit.</div>
+
+        <button class="primary" id="ctaBtn">Get my exact quote</button>
+
+        <form class="lead-form" id="leadForm">
+          <input type="text" placeholder="Full name" id="nameInput" required>
+          <input type="email" placeholder="Email" id="emailInput" required>
+          <input type="tel" placeholder="Phone" id="phoneInput" required>
+          <button class="primary" type="submit">Send my estimate</button>
+        </form>
+
+        <div class="confirm" id="confirmBlock">
+          <div class="check">Request received</div>
+          <p>Someone from our team will follow up with a firm quote after reviewing your details.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Estimate based on typical regional material and labor rates. Final pricing depends on measured roof area, local permitting, and site conditions.</footer>
+</div>
+
+<script>
+  // build tick marks
+  const ticks = document.getElementById('ticks');
+  for(let i=0;i<60;i++){ const s=document.createElement('span'); ticks.appendChild(s); }
+
+  const state = {
+    sqft: 2000,
+    material: {low:4.5, high:7},
+    pitchMult: 1.0,
+    storyMult: 1.0,
+    tearoff: 0
+  };
+
+  function setupGroup(id, key, callback){
+    const group = document.getElementById(id);
+    group.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        group.querySelectorAll('.opt').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        callback(btn);
+        update();
+      });
+    });
+  }
+
+  setupGroup('materialOpts', 'material', (btn)=>{
+    state.material = {low: parseFloat(btn.dataset.low), high: parseFloat(btn.dataset.high)};
+  });
+  setupGroup('pitchOpts', 'pitch', (btn)=>{
+    state.pitchMult = parseFloat(btn.dataset.mult);
+  });
+  setupGroup('storyOpts', 'story', (btn)=>{
+    state.storyMult = parseFloat(btn.dataset.mult);
+  });
+  setupGroup('tearoffOpts', 'tearoff', (btn)=>{
+    state.tearoff = parseFloat(btn.dataset.key);
+  });
+
+  const sqftInput = document.getElementById('sqft');
+  const sqftVal = document.getElementById('sqftVal');
+  sqftInput.addEventListener('input', ()=>{
+    state.sqft = parseInt(sqftInput.value, 10);
+    sqftVal.textContent = state.sqft.toLocaleString() + ' sq ft';
+    update();
+  });
+
+  function fmt(n){
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  function update(){
+    const complexity = state.pitchMult * state.storyMult;
+    const materialLow = state.sqft * state.material.low * complexity;
+    const materialHigh = state.sqft * state.material.high * complexity;
+    const tearoffCost = state.sqft * state.tearoff;
+
+    const low = materialLow + tearoffCost;
+    const high = materialHigh + tearoffCost;
+
+    document.getElementById('lowEst').textContent = fmt(low);
+    document.getElementById('highEst').textContent = fmt(high);
+
+    const breakdown = document.getElementById('breakdown');
+    breakdown.innerHTML = '';
+    const rows = [
+      ['Material + labor', fmt(materialLow) + '–' + fmt(materialHigh)],
+      ['Complexity factor', 'x' + complexity.toFixed(2)],
+      ['Tear-off', state.tearoff > 0 ? fmt(tearoffCost) : '—']
+    ];
+    rows.forEach(([label, val])=>{
+      const row = document.createElement('div');
+      row.innerHTML = '<span>'+label+'</span><span>'+val+'</span>';
+      breakdown.appendChild(row);
+    });
+  }
+
+  document.getElementById('ctaBtn').addEventListener('click', ()=>{
+    document.getElementById('ctaBtn').style.display = 'none';
+    document.getElementById('leadForm').classList.add('active');
+  });
+
+  document.getElementById('leadForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    document.getElementById('leadForm').classList.remove('active');
+    document.getElementById('confirmBlock').classList.add('active');
+  });
+
+  update();
+</script>
+</body>
+</html>
